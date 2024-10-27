@@ -29,56 +29,22 @@ class LoginController extends Controller
         }
     }
 
-    public function login_v()
-    {
-        return view('Login.loginv2', [
-            'title' => 'Login V2',
-        ]);
-    }
-
-    public function check_login_v2(Request $request)
-    {
-        $username = $request->username;
-        $domain = '@jic.ac.id';
-        $account2 = $username . $domain;
-
-        $employee = DB::table('tb_role_user')
-            ->join('ediis.tb_user', 'tb_user.id_user', 'tb_role_user.id_user')
-            ->join('db_hr.tb_employee', 'tb_employee.id_employee', 'ediis.tb_user.id_employee')
-            ->where('username', $username)
-            ->first();
-
-        if ($employee != null) {
-            session_start();
-            $request->Session()->put('username', $username);
-            $request->Session()->put('id_user', $employee->id_user);
-            $request->Session()->put('id_employee', $employee->id_employee);
-            $request->Session()->put('logged_in', true);
-            $request->Session()->put('role', $employee->id_role);
-            $request->Session()->save();
-            return redirect('dashboard');
-        } else {
-            \Session::put('error', 'Invalid Login!');
-            return redirect('login/');
-        }
-    }
-
     public function check_login(Request $request)
     {
-        $username = $request->username;
-        $password = $request->password;
+        $NamaPengguna = $request->NamaPengguna;
+        $password = $request->Password;
 
-        $check_login = PenggunaModel::where('username', $username)->where('password', $password)->first();
+        $check_login = PenggunaModel::where('NamaPengguna', $NamaPengguna)->where('Password', $password)->first();
 
         if ($check_login != null) {
-            $request->Session()->put('username', $username);
-            $request->Session()->put('id_pengguna', $check_login->id_pengguna);
+            $request->Session()->put('NamaPengguna', $NamaPengguna);
+            $request->Session()->put('IdPengguna', $check_login->IdPengguna);
             $request->Session()->put('logged_in', true);
-            $request->Session()->put('id_tipe_posisi', $check_login->id_tipe_posisi);
+            $request->Session()->put('IdAkses', $check_login->IdAkses);
             $request->Session()->save();
 
-            if($check_login->id_tipe_posisi == 1){
-                return redirect('list-transaksi');
+            if($check_login->IdAkses != 4){
+                return redirect('dashboard');
 
             }else{
                 return redirect('list-transaksi-customer');
@@ -92,6 +58,6 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         $request->session()->flush();
-        return redirect('/');
+        return redirect('/login');
     }
 }

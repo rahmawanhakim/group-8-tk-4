@@ -8,10 +8,10 @@
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>{{ $title }} | Trifecta</title>
+    <title>{{ $title }} | Group 8</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/jic/trifecta.PNG') }}" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/jic/logo.png') }}" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -130,13 +130,22 @@
             <div class="sidebar close">
                 <div class="logo-details mt-3">
                     {{-- <i class="bx bxl-c-plus-plus"></i> --}}
-                    <img class="img-xs" src="{{ asset('assets/img/jic/trifecta.png') }}" alt="">
-                    <h5 class="logo_name">Trifecta</h5>
+                    <img class="img-xs" src="{{ asset('assets/img/jic/logo.png') }}" alt="">
+                    <h5 class="logo_name">Group 8</h5>
                     {{-- <img src="{{ asset('assets/img/jic/jic.png') }}" style="width:140px;" alt=""> --}}
                 </div>
                 <ul class="nav-links">
-
                     <li class="menu-item mb-2 {{ $title == 'Dashboard' ? 'active' : '' }}">
+                        <a href="{{ route('dashboard') }}" class="menu-link">
+                            <i class="menu-icon tf-icons fas fa-home"></i>
+                            <span class="link_name">Dashboard</span>
+                        </a>
+                        <ul class="sub-menu blank">
+                            <li><a class="link_name" href="{{ route('dashboard') }}">Dashboard</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="menu-item mb-2 {{ $title == 'Barang' ? 'active' : '' }}">
                         <a href="{{ route('barang') }}" class="menu-link">
                             <i class="menu-icon tf-icons fas fa-wine-bottle"></i>
                             <span class="link_name">Barang</span>
@@ -145,28 +154,42 @@
                             <li><a class="link_name" href="{{ route('barang') }}">Barang</a></li>
                         </ul>
                     </li>
+                    
+                    @if ($IdAkses != 3)
+                        <li class="menu-item mb-2 {{ $title == 'List Transaksi' ? 'active' : '' }}">
+                            <a href="{{ route('list-transaksi') }}" class="menu-link">
+                                <i class="menu-icon tf-icons fas fa-list"></i>
+                                <span class="link_name">Transaksi</span>
+                            </a>
+                            <ul class="sub-menu blank">
+                                <li><a class="link_name" href="{{ route('list-transaksi') }}">Transaksi</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <li class="menu-item mb-2 {{ $title == 'Dashboard' ? 'active' : '' }}">
-                        <a href="{{ route('list-transaksi') }}" class="menu-link">
-                            <i class="menu-icon tf-icons fas fa-list"></i>
-                            <span class="link_name">Transaksi</span>
-                        </a>
-                        <ul class="sub-menu blank">
-                            <li><a class="link_name" href="{{ route('list-transaksi') }}">Transaksi</a></li>
-                        </ul>
-                    </li>
-
-
-                    <li class="menu-item mb-2 {{ $title == 'List Tipe Pengguna' ? 'active' : '' }}">
-                        <a href="{{ route('tipe-posisi') }}" class="menu-link">
-                            <i class="menu-icon tf-icons fas fa-user"></i>
-                            <span class="link_name">Pengguna</span>
-                        </a>
-                        <ul class="sub-menu blank">
-                            <li><a class="link_name" href="{{ route('tipe-posisi') }}">Pengguna</a>
-                            </li>
-                        </ul>
-                    </li>
+                    @if ($IdAkses == 1)
+                        <li
+                            class="menu-item mb-2 {{ $title == 'List Tipe Posisi' || $title == 'List Pengguna' ? 'active' : '' }}">
+                            <a href="{{ route('tipe-posisi') }}" class="menu-link">
+                                <i class="menu-icon tf-icons fas fa-user"></i>
+                                <span class="link_name">Pengguna</span>
+                            </a>
+                            <ul class="sub-menu blank">
+                                <li><a class="link_name" href="{{ route('tipe-posisi') }}">Pengguna</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="menu-item mb-2 {{ $title == 'List Supplier' ? 'active' : '' }}">
+                            <a href="{{ route('supplier') }}" class="menu-link">
+                                <i class="menu-icon tf-icons fas fa-box"></i>
+                                <span class="link_name">Supplier</span>
+                            </a>
+                            <ul class="sub-menu blank">
+                                <li><a class="link_name" href="{{ route('supplier') }}">Supplier</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
                 </ul>
             </div>
 
@@ -193,6 +216,10 @@
                                                         <div class="avatar avatar-online">
                                                             <img src="{{ asset('/uploads/no_images.png') }}" />
                                                         </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <span class="fw-semibold d-block">Tes nama</span>
+                                                        <small class="text-muted">Tes</small>
                                                     </div>
                                                     <div class="flex-grow-1">
                                                     </div>
@@ -239,6 +266,12 @@
                             @if ($title == 'List Pengguna')
                                 @yield('pengguna')
                             @endif
+                            @if ($title == 'List Supplier')
+                                @yield('supplier')
+                            @endif
+                            @if ($title == 'Dashboard')
+                                @yield('dashboard')
+                            @endif
 
 
                             <footer class="content-footer footer bg-footer-theme">
@@ -267,7 +300,7 @@
                 <form action="{{ route('logout') }}" method="GET" enctype="multipart/form-data">
                     <div class="modal-body">
                         @csrf
-                        <input type="hidden" name="id_req_cancel" id="id_req_cancel" value="">
+                        <input type="hidden" name="Idreq_cancel" id="Idreq_cancel" value="">
                         Are you sure you want to logout ?
                     </div>
                     <div class="modal-footer">

@@ -1,5 +1,5 @@
 @extends('Admin.template')
-@section('pengguna')
+@section('supplier')
     <style>
         .ui-autocomplete {
             z-index: 9999999 !important;
@@ -23,7 +23,7 @@
                     <a href="{{ url('tipe-posisi') }}">Tipe Posisi</a>
                 </li>
                 <li class="breadcrumb-item {{ $title == 'Card' ? 'active' : '' }}">
-                    <a href="{{ url('pengguna/1') }}">Pengguna</a>
+                    <a href="{{ url('supplier') }}">Supplier</a>
                 </li>
             </ol>
         </nav>
@@ -45,10 +45,7 @@
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Name Pengguna</th>
-                                <th>Posisi</th>
-                                <th>Username</th>
-                                <th>Password</th>
+                                <th>Name Supplier</th>
                                 <th>No HP</th>
                                 <th>Alamat</th>
 
@@ -56,44 +53,34 @@
                             </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
-                            @if ($data_pengguna != null)
+                            @if ($data_supplier != null)
                                 <?php $limit = isset($_GET['limit']) ? $_GET['limit'] : request('sortir');
                                 $page = isset($_GET['page']) ? $_GET['page'] : 1;
                                 $no = $limit * $page - $limit; ?>
 
-                                @foreach ($data_pengguna as $item)
+                                @foreach ($data_supplier as $item)
                                     <tr style="text-align: left;">
                                         <td>{{ ++$no }}</td>
-                                        <td>{{ $item->NamaDepan . ' ' . $item->NamaBelakang }}</td>
+                                        
                                         <td>
-                                            @if ($item->IdAkses == 1)
-                                                Admin
-                                            @else
-                                                Customer
-                                            @endif
+                                            {{ $item->NamaSupplier }}
                                         </td>
                                         <td>
-                                            {{ $item->NamaPengguna }}
+                                            {{ $item->NomorTelfonSupplier }}
                                         </td>
                                         <td>
-                                            {{ $item->Password }}
-                                        </td>
-                                        <td>
-                                            {{ $item->NoHp }}
-                                        </td>
-                                        <td>
-                                            {{ $item->Alamat }}
+                                            {{ $item->AlamatSupplier }}
                                         </td>
 
                                         <td class="text-center">
                                             <button type="button" class="btn rounded-pill btn-icon btn-danger btn_delete"
                                                 data-bs-toggle="modal" data-bs-target="#modalDelete"
-                                                data-id="{{ $item->IdPengguna }}">
+                                                data-id="{{ $item->IdSupplier }}">
                                                 <span class="fas fa-trash-alt"></span>
                                             </button>
                                             <button type="button" class="btn rounded-pill btn-icon btn-warning btn_update"
-                                                value="{{ $item->IdPengguna }}" data-bs-toggle="modal"
-                                                data-bs-target="#modalCenter" data-id="{{ $item->IdPengguna }}">
+                                                value="{{ $item->IdSupplier }}" data-bs-toggle="modal"
+                                                data-bs-target="#modalCenter" data-id="{{ $item->IdSupplier }}">
                                                 <span class="fas fa-edit"></span>
                                             </button>
                                         </td>
@@ -134,13 +121,13 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalCenterTitle">Hapus Pengguna</h5>
+                    <h5 class="modal-title" id="modalCenterTitle">Hapus Supplier</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('hapus-pengguna') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('hapus-supplier') }}" method="POST" enctype="multipart/form-data">
                     <div class="modal-body">
                         @csrf
-                        <input type="hidden" value="" id="IdPengguna_delete" name="IdPengguna_delete">
+                        <input type="hidden" value="" id="IdSupplier_delete" name="IdSupplier_delete">
                         <label class="form-label" style="text-transform: uppercase">Apakah anda yakin ingin menghapus data
                             ini ?</label>
                     </div>
@@ -161,37 +148,22 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalCenterTitle">Tambah Pengguna</h5>
+                    <h5 class="modal-title" id="modalCenterTitle">Tambah Supplier</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('tambah-pengguna') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('tambah-supplier') }}" method="POST" enctype="multipart/form-data">
                     <div class="modal-body">
 
-                        <input type="hidden" id="IdPengguna" name="IdPengguna">
+                        <input type="hidden" id="IdSupplier" name="IdSupplier">
 
                         @csrf
                         <div class="row mb-3">
-                            <label class="col-sm-4 col-form-label">Nama Depan</label>
+                            <label class="col-sm-4 col-form-label">Nama Supplier</label>
                             <div class="col-sm-8">
                                 <div class="row mb-2">
                                     <div class="col-sm-9">
-                                        <input class="form-control" required type="text" id="NamaDepan"
-                                            name="NamaDepan">
-                                        <input type="hidden" id="IdAkses" name="IdAkses"
-                                            value="{{ $id }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="col-sm-4 col-form-label">Nama Belakang</label>
-                            <div class="col-sm-8">
-                                <div class="row mb-2">
-                                    <div class="col-sm-9">
-                                        <input class="form-control" required type="text" id="NamaBelakang"
-                                            name="NamaBelakang">
-                                        <input type="hidden" id="IdAkses" name="IdAkses"
-                                            value="{{ $id }}">
+                                        <input class="form-control" required type="text" id="NamaSupplier"
+                                            name="NamaSupplier">
                                     </div>
                                 </div>
                             </div>
@@ -203,8 +175,6 @@
                                     <div class="col-sm-9">
                                         <input class="form-control" required type="number" id="NoHP"
                                             name="NoHP">
-                                        <input type="hidden" id="IdAkses" name="IdAkses"
-                                            value="{{ $id }}">
                                     </div>
                                 </div>
                             </div>
@@ -216,40 +186,10 @@
                                     <div class="col-sm-9">
                                         <input class="form-control" required type="text" id="Alamat"
                                             name="Alamat">
-                                        <input type="hidden" id="IdAkses" name="IdAkses"
-                                            value="{{ $id }}">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row mb-3">
-                            <label class="col-sm-4 col-form-label">Username</label>
-                            <div class="col-sm-8">
-                                <div class="row mb-2">
-                                    <div class="col-sm-9">
-                                        <input class="form-control" required type="text" id="NamaPengguna"
-                                            name="NamaPengguna">
-                                        <input type="hidden" id="IdAkses" name="IdAkses"
-                                            value="{{ $id }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="col-sm-4 col-form-label">Password</label>
-                            <div class="col-sm-8">
-                                <div class="row mb-2">
-                                    <div class="col-sm-9">
-                                        <input class="form-control" required type="text" id="Password"
-                                            name="Password">
-                                        <input type="hidden" id="IdAkses" name="IdAkses"
-                                            value="{{ $id }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
                         <div class="modal-footer">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                                 Cancel
@@ -299,15 +239,15 @@
 
         $(".btn_delete").click(function() {
             var id = $(this).data('id');
-            $('#IdPengguna_delete').val(id)
+            $('#IdSupplier_delete').val(id)
 
         });
 
         $(".btn_add").click(function() {
-            $('#IdPengguna').val('');
-            $('#NamaPengguna').val('');
+            $('#IdSupplier').val('');
+            $('#NamaSupplier').val('');
             $('#NamaDepan').val('');
-            $('#NamaBelakang').val('');
+            $('#NamaSupplier').val('');
             $('#Password').val('');
             $('#NoHP').val('');
             $('#Alamat').val('');
@@ -321,13 +261,10 @@
                 url: "{{ url('get-item-user') }}/" + id,
                 success: function(data) {
                     console.log(data);
-                    $('#IdPengguna').val(data.data.IdPengguna);
-                    $('#NamaPengguna').val(data.data.NamaPengguna);
-                    $('#NamaDepan').val(data.data.NamaDepan);
-                    $('#NamaBelakang').val(data.data.NamaBelakang);
-                    $('#Password').val(data.data.Password);
-                    $('#NoHP').val(data.data.NoHp);
-                    $('#Alamat').val(data.data.Alamat);
+                    $('#IdSupplier').val(data.data.IdSupplier);
+                    $('#NamaSupplier').val(data.data.NamaSupplier);
+                    $('#NoHP').val(data.data.NomorTelfonSupplier);
+                    $('#Alamat').val(data.data.AlamatSupplier);
 
                 }
             });

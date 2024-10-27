@@ -19,7 +19,7 @@ class BarangController extends Controller
 
     public function barang(Request $request)
     {
-        if ($request->Session()->get('logged_in') == true && $request->Session()->get('id_tipe_posisi') == 1) {
+        if ($request->Session()->get('logged_in') == true && $request->Session()->get('IdAkses') != 4) {
 
             $search = $request->search;
             $sortir = 10;
@@ -27,17 +27,17 @@ class BarangController extends Controller
                 $sortir = $request->sortir;
             }
 
-            $data_barang = BarangModel::leftjoin('tb_pengguna', 'tb_pengguna.id_pengguna', 'tb_barang.barang_ditambah_oleh')
-                ->select('tb_barang.*', 'nama_pengguna');
+            $data_barang = BarangModel::where('NamaBarang', '!=', null);
 
             if ($search) {
-                $data_barang =  $data_barang->where('nama_barang', 'like', '%' . $search . '%');
+                $data_barang =  $data_barang->where('NamaBarang', 'like', '%' . $search . '%');
             }
 
             // return $data_barang->get();
 
             return view('Admin.Barang.barang', [
                 'title' => 'List Barang',
+                'IdAkses' => $request->Session()->get('IdAkses'),
                 'data_barang' => $data_barang->paginate($sortir),
             ]);
         } else {
@@ -45,26 +45,27 @@ class BarangController extends Controller
         }
     }
 
-    public function tambah_stok_barang($id)
+    public function tambah_stok_barang(Request $request, $id)
     {
-        $data_barang = BarangModel::where('id_barang', $id)->first();
+        $data_barang = BarangModel::where('IdBarang', $id)->first();
 
-        $stock_in = TransaksiModel::join('tb_detail_transaksi', 'tb_detail_transaksi.id_transaksi', 'tb_transaksi.id_transaksi')
-            ->where('tb_detail_transaksi.id_barang', $id)
-            ->where('jenis_transaksi', 1)
-            ->where('status_transaksi', 2)
-            ->get()->sum('total_barang');
+        $stock_in = TransaksiModel::join('detail_transaksi', 'detail_transaksi.IdTransaksi', 'transaksi.IdTransaksi')
+            ->where('detail_transaksi.IdBarang', $id)
+            ->where('JenisTransaksi', 1)
+            ->where('StatusTransaksi', 2)
+            ->get()->sum('TotalBarang');
 
-        $stock_out = TransaksiModel::join('tb_detail_transaksi', 'tb_detail_transaksi.id_transaksi', 'tb_transaksi.id_transaksi')
-            ->where('tb_detail_transaksi.id_barang', $id)
-            ->where('jenis_transaksi', 0)
-            ->get()->sum('total_barang');
+        $stock_out = TransaksiModel::join('detail_transaksi', 'detail_transaksi.IdTransaksi', 'transaksi.IdTransaksi')
+            ->where('detail_transaksi.IdBarang', $id)
+            ->where('JenisTransaksi', 0)
+            ->get()->sum('TotalBarang');
 
         $total_stock = $stock_in - $stock_out;
 
         return view('Admin.Barang.tambah-stok-barang', [
             'data_barang' => $data_barang,
             'stock_in' => $stock_in,
+            'IdAkses' => $request->Session()->get('IdAkses'),
             'stock_out' => $stock_out,
             'total_stock' => $total_stock,
             'title' => 'Tambah Stok Barang',
@@ -85,18 +86,19 @@ class BarangController extends Controller
     public function tambah_barang(Request $request)
     {
         $data = new BarangModel;
-        $data->nama_barang = $request->nama_barang;
-        if ($request->hasFile('gambar_barang')) {
+        $data->NamaBarang = $request->NamaBarang;
+        if ($request->hasFile('GambarBarang')) {
             $destination_path = 'gambar_barang/';
             $file_name = date('ymd') . '_';
-            $image = $request->file('gambar_barang');
+            $image = $request->file('GambarBarang');
             $name = $file_name . rand(1000, 9999) . $image->getClientOriginalName();
             $image->move($destination_path, $name);
-            $data->gambar_barang = $name;
+            $data->GambarBarang = $name;
         }
-        $data->deskripsi_barang = $request->deskripsi_barang;
-        $data->tanggal_barang_ditambah = date('Y-m-d H:i:s');
-        // $data->barang_ditambah_oleh = $request->Session()->get('id_pengguna');
+        $data->Keterangan = $request->Keterangan;
+        $data->SatuanBarang = $request->SatuanBarang;
+        $data->HargaBarang = $request->HargaBarang;
+        // $data->barang_ditambah_oleh = $request->Session()->get('IdPengguna');
 
         $data->save();
         if ($data) {
@@ -108,11 +110,11 @@ class BarangController extends Controller
         }
     }
 
-  
 
-    public function delete_beverage(Request $request)
+
+    public function delete_barang(Request $request)
     {
-        $data = BarangModel::where('id_barang', $request->id_barang_delete)->forceDelete();
+        $data = BarangModel::where('IdBarang', $request->IdBarang_delete)->forceDelete();
 
         if ($data) {
             \Session::put('success', 'Delete Barang Success!');
@@ -134,7 +136,7 @@ class BarangController extends Controller
         ]);
     }
 
-    public function harga_barang(Request $request, $id)
+    public function HargaBarang(Request $request, $id)
     {
 
         $sortir = 10;
@@ -143,41 +145,23 @@ class BarangController extends Controller
             $sortir = $request->sortir;
         }
 
-        $data_harga_barang = HargaBarangModel::leftjoin('tb_pengguna', 'tb_pengguna.id_pengguna', 'tb_harga_barang.harga_barang_ditambah_oleh')
-            ->where('id_barang', $id)
-            ->orderBy('id_harga_barang', 'DESC')
+        $data_HargaBarang = HargaBarangModel::leftjoin('pengguna', 'pengguna.IdPengguna', 'HargaBarang.HargaBarang_ditambah_oleh')
+            ->where('IdBarang', $id)
+            ->orderBy('IdHargaBarang', 'DESC')
             ->paginate($sortir);
 
         return view('Admin.Barang.harga-barang', [
             'title' => 'Harga Barang',
-            'data_harga_barang' => $data_harga_barang,
+            'IdAkses' => $request->Session()->get('IdAkses'),
+            'data_HargaBarang' => $data_HargaBarang,
             'id' => $id,
         ]);
     }
 
 
-
-    public function tambah_harga_barang(Request $request)
-    {
-        $data = new HargaBarangModel;
-        $data->harga_barang = str_replace(array('Rp.', '.', ','), "", $request->harga_barang);
-        $data->id_barang = $request->id_barang;
-        $data->tanggal_harga_barang_ditambah = date('Y-m-d H:i:s');
-        $data->harga_barang_ditambah_oleh = 1;
-        $data->save();
-
-        if ($data) {
-            \Session::put('success', 'Tambah Harga Barang!');
-            return redirect()->back();
-        } else {
-            \Session::put('error', 'Add New Beverage Price Failed!');
-            return redirect()->back();
-        }
-    }
-
     public function delete_beverage_price(Request $request)
     {
-        $data = HargaBarangModel::where('id_barang_price', $request->id_barang_price_delete)->forceDelete();
+        $data = HargaBarangModel::where('IdBarang_price', $request->IdBarang_price_delete)->forceDelete();
 
         if ($data) {
             \Session::put('success', 'Hapu Harga Barang Sukses!');
@@ -231,25 +215,26 @@ class BarangController extends Controller
 
     public function list_transaksi(Request $request)
     {
-        if ($request->Session()->get('logged_in') == true && $request->Session()->get('id_tipe_posisi') == 1) {
+        if ($request->Session()->get('logged_in') == true && $request->Session()->get('IdAkses') != 4) {
             $sortir = 10;
             if ($request->sortir) {
                 $sortir = $request->sortir;
             }
             $search = $request->search;
 
-            $data_beverage_request = TransaksiModel::leftJoin('tb_pengguna', 'tb_pengguna.id_pengguna', 'tb_transaksi.id_pengguna')
-                ->where('status_transaksi', 1)
-                ->where('jenis_transaksi', 0)
-                ->orderBy('tanggal_transaksi_ditambah', 'desc');
+            $data_beverage_request = TransaksiModel::leftJoin('pengguna', 'pengguna.IdPengguna', 'transaksi.IdPengguna')
+                ->where('StatusTransaksi', 1)
+                ->where('JenisTransaksi', 0)
+                ->orderBy('TanggalTransaksiDitambah', 'desc');
 
 
 
             if ($search !== null) {
-                $data_beverage_request =  $data_beverage_request->where('nama_pengguna', 'like', '%' . $search . '%');
+                $data_beverage_request =  $data_beverage_request->where('NamaPengguna', 'like', '%' . $search . '%');
             }
 
             return view('Admin.Transaksi.list-transaksi', [
+                'IdAkses' => $request->Session()->get('IdAkses'),
                 'title' => 'List Transaksi',
                 'data_beverage_request' => $data_beverage_request->paginate($sortir),
 
@@ -261,21 +246,24 @@ class BarangController extends Controller
 
     public function update_barang(Request $request)
     {
-        $data = BarangModel::find($request->id_barang);
-        $data->nama_barang = $request->nama_barang_edit;
-        if ($request->hasFile('gambar_barang_edit')) {
-            if ($data->gambar_barang != null) {
-                unlink(public_path('gambar_barang/' . $data->gambar_barang));
+        $data = BarangModel::find($request->IdBarang);
+        $data->NamaBarang = $request->NamaBarang_edit;
+        if ($request->hasFile('GambarBarang_edit')) {
+            if ($data->GambarBarang != null) {
+                unlink(public_path('gambar_barang/' . $data->GambarBarang));
             }
             $destination_path = 'gambar_barang/';
             $file_name = date('ymd') . '_';
-            $image = $request->file('gambar_barang_edit');
+            $image = $request->file('GambarBarang_edit');
             $name = $file_name . rand(1000, 9999) . $image->getClientOriginalName();
             // return $name;
             $image->move($destination_path, $name);
-            $data->gambar_barang = $name;
+            $data->GambarBarang = $name;
         }
-        $data->deskripsi_barang = $request->deskripsi_barang_edit;
+        $data->Keterangan = $request->Keterangan_edit;
+        $data->SatuanBarang = $request->SatuanBarang_edit;
+        $data->HargaBarang = $request->HargaBarang_edit;
+
 
         $data->save();
         if ($data) {
@@ -290,7 +278,7 @@ class BarangController extends Controller
 
     public function history_transaksi(Request $request)
     {
-        if ($request->Session()->get('logged_in') == true && $request->Session()->get('id_tipe_posisi') == 1) {
+        if ($request->Session()->get('logged_in') == true && $request->Session()->get('IdAkses') != 4) {
 
             $sortir = 10;
             if ($request->sortir) {
@@ -298,17 +286,19 @@ class BarangController extends Controller
             }
             $search = $request->search;
 
-            $data_beverage_request = TransaksiModel::leftJoin('tb_pengguna', 'tb_pengguna.id_pengguna', 'tb_transaksi.id_pengguna')
-                ->join('tb_detail_transaksi', 'tb_detail_transaksi.id_transaksi', 'tb_transaksi.id_transaksi')
-                ->where('status_transaksi','!=', 1)
-                ->groupBy('tb_detail_transaksi.id_transaksi')
-                ->orderBy('tanggal_transaksi_ditambah', 'desc');
+            $data_beverage_request = TransaksiModel::leftJoin('pengguna', 'pengguna.IdPengguna', 'transaksi.IdPengguna')
+                ->leftJoin('supplier', 'supplier.IdSupplier', 'transaksi.IdSupplier')
+                ->join('detail_transaksi', 'detail_transaksi.IdTransaksi', 'transaksi.IdTransaksi')
+                ->where('StatusTransaksi', '!=', 1)
+                ->groupBy('detail_transaksi.IdTransaksi')
+                ->orderBy('TanggalTransaksiDitambah', 'desc');
 
             if ($search !== null) {
-                $data_beverage_request =  $data_beverage_request->where('nama_pengguna', 'like', '%' . $search . '%');
+                $data_beverage_request =  $data_beverage_request->where('NamaPengguna', 'like', '%' . $search . '%');
             }
 
             return view('Admin.Transaksi.history-transaksi', [
+                'IdAkses' => $request->Session()->get('IdAkses'),
                 'title' => 'History Transaksi',
                 'data_beverage_request' => $data_beverage_request->paginate($sortir),
 
@@ -324,8 +314,8 @@ class BarangController extends Controller
     public function ubah_status(Request $request)
     {
 
-        $data = TransaksiModel::find($request->id_transaksi);
-        $data->status_transaksi = 2;
+        $data = TransaksiModel::find($request->IdTransaksi);
+        $data->StatusTransaksi = 2;
         $data->save();
 
         if ($data) {
@@ -341,8 +331,8 @@ class BarangController extends Controller
     public function hapus_transaksi(Request $request)
     {
 
-        $data = TransaksiModel::find($request->id_transaksi);
-        $data->status_transaksi = 0;
+        $data = TransaksiModel::find($request->IdTransaksi);
+        $data->StatusTransaksi = 0;
         $data->save();
 
 
@@ -359,18 +349,20 @@ class BarangController extends Controller
     public function tambah_transaksi_stok_barang(Request $request)
     {
         $data = new TransaksiModel();
-        $data->status_transaksi = 2;
-        $data->jenis_transaksi = 1;
-        $data->tanggal_transaksi_ditambah = date('Y-m-d H:i:s');
-        // $data->beverage_sent_by = $request->Session()->get('id_pengguna');
-        $data->id_pengguna = '';
+        $data->StatusTransaksi = 2;
+        $data->JenisTransaksi = 1;
+        $data->TanggalTransaksiDitambah = date('Y-m-d H:i:s');
+        $data->TransaksiDitambahOleh = $request->Session()->get('IdPengguna');
+        $data->IdSupplier = $request->IdSupplier;
+        $data->TotalHargaTransaksi = str_replace(array('Rp.', '.', ','), "", $request->TotalHarga);
+        $data->IdPengguna = '';
         $data->save();
 
         $data_detail = new DetailTransaksiModel();
-        $data_detail->id_barang = $request->id_barang;
-        $data_detail->id_transaksi = $data->id_transaksi;
-        $data_detail->harga_barang = str_replace(array('Rp.', '.', ','), "", $request->total_harga);
-        $data_detail->total_barang = $request->total_barang;
+        $data_detail->IdBarang = $request->IdBarang;
+        $data_detail->IdTransaksi = $data->IdTransaksi;
+        $data_detail->HargaBarang = str_replace(array('Rp.', '.', ','), "", $request->TotalHarga);
+        $data_detail->TotalBarang = $request->TotalBarang;
         $data_detail->save();
 
         if ($data && $data_detail) {
@@ -384,8 +376,8 @@ class BarangController extends Controller
 
     public function item_beverage_select(Request $request, $id)
     {
-        $data = HargaBarangModel::join('tb_beverage', 'tb_beverage.id_barang', 'tb_beverage_price.id_barang')
-            ->where('tb_beverage_price.id_barang', $id)
+        $data = HargaBarangModel::join('beverage', 'beverage.IdBarang', 'beverage_price.IdBarang')
+            ->where('beverage_price.IdBarang', $id)
             ->where('beverage_price_start_date', '<=', date('Y-m-d'))
             ->orderBy('beverage_price_start_date', 'desc')
             ->first();
@@ -395,7 +387,4 @@ class BarangController extends Controller
             'beverage_data' => $data,
         ]);
     }
-
-
-    
 }

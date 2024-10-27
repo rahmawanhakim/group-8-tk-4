@@ -10,7 +10,7 @@
     <title>Login</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/jic/trifecta.png') }}" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/jic/logo.png') }}" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -59,11 +59,11 @@
                         <!-- Logo -->
                         <div class="app-brand justify-content-center">
                             <span class="app-brand-logo demo">
-                                <img src="{{ asset('assets/img/jic/trifecta-red.png') }}" style="width:60px;" alt="">
+                                <img src="{{ asset('assets/img/jic/logo-full.png') }}" style="width:100px;" alt="">
                             </span>
                         </div>
                         <!-- /Logo -->
-                        <h4 class="mb-2">Welcome to Trifecta!👋</h4>
+                        <h4 class="mb-2">Welcome to Group 8!👋</h4>
                         <p class="mb-4">Please sign-in to your account</p>
 
                         @if (\Session::has('error'))
@@ -83,9 +83,9 @@
                         <form id="formAuthentication" class="mb-3" action="{{ route('check-login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username"
-                                    placeholder="Enter your username" autofocus required />
+                                <label for="NamaPengguna" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="NamaPengguna" name="NamaPengguna"
+                                    placeholder="Enter your NamaPengguna" autofocus required />
                             </div>
                             <div class="mb-3 form-password-toggle">
                                 <div class="d-flex justify-content-between">
@@ -95,7 +95,7 @@
                                     </a>
                                 </div>
                                 <div class="input-group input-group-merge">
-                                    <input type="password" id="password" class="form-control" name="password"
+                                    <input type="password" id="Password" class="form-control" name="Password"
                                         placeholder="Enter your password" oninput="hiddenscript()"
                                         aria-describedby="password" required />
                                     <span class="input-group-text cursor-pointer">

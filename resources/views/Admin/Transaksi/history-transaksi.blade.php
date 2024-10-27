@@ -24,7 +24,7 @@
             </li>
         </ul>
         <div class="card">
-            <h5 class="card-header">Beverage Request</h5>
+            <h5 class="card-header">List Pesanan Barang</h5>
             <div class="card-body">
                 <div class="row mb-4">
                     <div class="col-sm-4">
@@ -41,7 +41,7 @@
                         <thead>
                             <tr style="background-color: rgba(67, 89, 113, 0.1)">
                                 <th class="align-middle" rowspan="2" style="text-align: center">No</th>
-                                <th class="align-middle" rowspan="2" style="text-align: center">Customer</th>
+                                <th class="align-middle" rowspan="2" style="text-align: center">Pelanggan / Supplier</th>
                                 <th class="align-middle" rowspan="2" style="text-align: center">Tanggal Pesanan</th>
                                 <th class="text-center" colspan="4">Detail</th>
                                 <th class="align-middle" rowspan="2" style="text-align: center">Status</th>
@@ -62,9 +62,10 @@
                                 $no = $limit * $page - $limit; ?>
                                 @foreach ($data_beverage_request as $item)
                                     <?php
-                                    $data_barang = DB::table('tb_detail_transaksi')
-                                        ->join('tb_barang', 'tb_barang.id_barang', 'tb_detail_transaksi.id_barang')
-                                        ->where('id_transaksi', $item->id_transaksi)
+                                    $data_barang = DB::table('detail_transaksi')
+                                        ->select('barang.NamaBarang', 'detail_transaksi.*')
+                                        ->join('barang', 'barang.IdBarang', 'detail_transaksi.IdBarang')
+                                        ->where('IdTransaksi', $item->IdTransaksi)
                                         ->get();
                                     
                                     $total_tabel = $data_barang->count();
@@ -76,11 +77,15 @@
                                             {{ ++$no }}</td>
                                         <td class="text-center" rowspan="{{ $total_tabel + 1 }}"
                                             style="text-align: center">
-                                            {{ $item->nama_pengguna == null ? 'Admin' : $item->nama_pengguna }}</td>
-
+                                            @if ($item->JenisTransaksi == 1)
+                                                {{ $item->NamaSupplier }}
+                                            @else
+                                                {{ $item->NamaDepan . ' ' . $item->NamaBelakang  }}
+                                            @endif
+                                        </td>
                                         <td class="text-center fw-bold" rowspan="{{ $total_tabel + 1 }}"
                                             style="width: 15%">
-                                            {{ date('j M Y ', strtotime($item->tanggal_transaksi_ditambah)) }}
+                                            {{ date('j M Y ', strtotime($item->TanggalTransaksiDitambah)) }}
                                         </td>
                                     </tr>
 
@@ -93,33 +98,34 @@
                                             <td class="text-center" style="display:none; width: 10%">
                                                 {{ ++$no_item }}</td>
                                             <td class="text-center fw-bold" style="text-transform:uppercase; width: 15%">
-                                                {{ $i->nama_barang }}</td>
-                                            <td class="text-center" style="width: 15%">{{ $i->total_barang }}
+                                                {{ $i->NamaBarang }}</td>
+                                            <td class="text-center" style="width: 15%">{{ $i->TotalBarang }}
                                                 pcs
                                             </td>
                                             <td class="text-center" style="width: 15%">
                                                 {{-- {{ 'Rp. ' . number_format($i->beverage_price, 0, ',', '.') }} --}}
-                                                {{ 'Rp. ' . number_format($i->harga_barang / $i->total_barang, 0, ',', '.') }}
+                                                {{ 'Rp. ' . number_format($i->HargaBarang / $i->TotalBarang, 0, ',', '.') }}
                                             </td>
                                             <td class="text-center" style="width: 15%">
-                                                {{ 'Rp. ' . number_format($i->harga_barang, 0, ',', '.') }}
+                                                {{ 'Rp. ' . number_format($i->HargaBarang, 0, ',', '.') }}
                                             </td>
                                             @if ($no_item == 1)
                                                 <td class="text-center" rowspan="{{ $total_tabel }}" style="width: 15%">
 
-                                                    <button type="button" class="badge bg-label-{{ $item->status_transaksi == 2 ? 'success' : 'danger' }}"
-                                                        style="border: none;" value="{{ $item->id_transaksi }}"
-                                                        >
-                                                        {{ $item->status_transaksi == 2 ? 'Selesai' : 'Dibatalkan' }}
+                                                    <button type="button"
+                                                        class="badge bg-label-{{ $item->StatusTransaksi == 2 ? 'success' : 'danger' }}"
+                                                        style="border: none;" value="{{ $item->IdTransaksi }}">
+                                                        {{ $item->StatusTransaksi == 2 ? 'Selesai' : 'Dibatalkan' }}
                                                     </button>
 
                                                 </td>
                                                 <td class="text-center" rowspan="{{ $total_tabel }}" style="width: 15%">
 
-                                                    <button type="button" class="badge bg-label-{{ $item->jenis_transaksi == 1 ? 'success' : 'danger' }}"
-                                                        style="border: none;" value="{{ $item->id_transaksi }}"
+                                                    <button type="button"
+                                                        class="badge bg-label-{{ $item->JenisTransaksi == 1 ? 'success' : 'danger' }}"
+                                                        style="border: none;" value="{{ $item->IdTransaksi }}"
                                                         id="buttonPending">
-                                                        {{ $item->jenis_transaksi == 1 ? 'Pembelian' : 'Penjualan' }}
+                                                        {{ $item->JenisTransaksi == 1 ? 'Pembelian' : 'Penjualan' }}
                                                     </button>
 
                                                 </td>
@@ -163,93 +169,93 @@
             </div>
         </div>
     </div>
-    @endsection
-    @section('js')
-        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            var strQuery, strUrlParams, nSearch, nPaginatorSelected;
-            $(document).ready(function() {
+@endsection
+@section('js')
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var strQuery, strUrlParams, nSearch, nPaginatorSelected;
+        $(document).ready(function() {
 
-                strQuery = window.location.search;
-                strUrlParams = new URLSearchParams(strQuery);
-                nSearch = strUrlParams.get('search')
+            strQuery = window.location.search;
+            strUrlParams = new URLSearchParams(strQuery);
+            nSearch = strUrlParams.get('search')
 
-            });
+        });
 
-            function getSearch() {
-                var result;
-                nSearchFiltering = $(".search").val();
-                if (nSearch) {
-                    result = nSearch;
+        function getSearch() {
+            var result;
+            nSearchFiltering = $(".search").val();
+            if (nSearch) {
+                result = nSearch;
 
+            } else {
+                if (nSearchFiltering) {
+                    result = nSearchFiltering;
                 } else {
-                    if (nSearchFiltering) {
-                        result = nSearchFiltering;
-                    } else {
-                        result = ""
-                    }
+                    result = ""
                 }
-                return result;
+            }
+            return result;
+        }
+
+        $(".listAttr").click(function() {
+            var nValue = $(this).val();
+            console.log(nValue);
+            $('#sortir').val(nValue);
+            submitFilter(nValue);
+
+        });
+
+
+        $('#btnSearch').click(function() {
+            var search = $(this).val();
+            submitFilter(search);
+        });
+
+        $(".reset_filter").click(function() {
+
+            $('#start_date').val('');
+            $('#end_date').val('');
+            $('#beverage_status').val('');
+            $('#beverage_flow').val('');
+            $('#search_form').submit();
+
+        });
+
+        function submitFilter(search) {
+
+            if (search) {
+                var nSearchFiltered = search;
+            } else {
+                var nSearchFiltered = getSearch();
             }
 
-            $(".listAttr").click(function() {
-                var nValue = $(this).val();
-                console.log(nValue);
-                $('#sortir').val(nValue);
-                submitFilter(nValue);
+            $('#search').val(nSearchFiltered);
+            $('#search_form').submit();
+        }
 
-            });
+        @if (\Session::has('success'))
+            var msg = "{{ Session::get('success') }}"
+            Swal.fire(
+                'Success',
+                msg,
+                'success'
+            )
+            @php \Session::forget('success') @endphp
+            @php \Session::forget('error') @endphp
+            @php \Session::forget('info') @endphp
+        @endif
 
-
-            $('#btnSearch').click(function() {
-                var search = $(this).val();
-                submitFilter(search);
-            });
-
-            $(".reset_filter").click(function() {
-
-                $('#start_date').val('');
-                $('#end_date').val('');
-                $('#beverage_status').val('');
-                $('#beverage_flow').val('');
-                $('#search_form').submit();
-
-            });
-
-            function submitFilter(search) {
-
-                if (search) {
-                    var nSearchFiltered = search;
-                } else {
-                    var nSearchFiltered = getSearch();
-                }
-
-                $('#search').val(nSearchFiltered);
-                $('#search_form').submit();
-            }
-
-            @if (\Session::has('success'))
-                var msg = "{{ Session::get('success') }}"
-                Swal.fire(
-                    'Success',
-                    msg,
-                    'success'
-                )
-                @php \Session::forget('success') @endphp
-                @php \Session::forget('error') @endphp
-                @php \Session::forget('info') @endphp
-            @endif
-
-            @if (\Session::has('error'))
-                var msg = "{{ Session::get('error') }}"
-                Swal.fire(
-                    'Whoops',
-                    msg,
-                    'error'
-                )
-                @php \Session::forget('success') @endphp
-                @php \Session::forget('error') @endphp
-                @php \Session::forget('info') @endphp
-            @endif
-        </script>
-    @stop
+        @if (\Session::has('error'))
+            var msg = "{{ Session::get('error') }}"
+            Swal.fire(
+                'Whoops',
+                msg,
+                'error'
+            )
+            @php \Session::forget('success') @endphp
+            @php \Session::forget('error') @endphp
+            @php \Session::forget('info') @endphp
+        @endif
+    </script>
+@stop

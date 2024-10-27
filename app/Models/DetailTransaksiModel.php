@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DetailTransaksiModel extends Model
 {
-    protected $table = 'trifecta.tb_detail_transaksi';
-    protected $primaryKey = 'id_detail_transaksi';
+    protected $table = 'db_tk3.detail_transaksi';
+    protected $primaryKey = 'IdDetailTransaksi';
     public $timestamps = false;
 }

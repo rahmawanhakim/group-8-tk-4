@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PenggunaModel extends Model
 {
-    protected $table = 'trifecta.tb_pengguna';
-    protected $primaryKey = 'id_pengguna';
+    protected $table = 'db_tk3.pengguna';
+    protected $primaryKey = 'IdPengguna';
     public $timestamps = false;
 }

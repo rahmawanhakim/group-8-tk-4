@@ -45,10 +45,10 @@
                                     <select class="form-select select_item" id="beverage_list" style="width: 100%">
                                         <option value=''>Select item</option>
                                         @foreach ($beverage as $bv)
-                                            <option value="{{ $bv->id_barang }}">
-                                                <img src="{{ asset('gambar_barang/' . $bv->gambar_barang) }}"
+                                            <option value="{{ $bv->IdBarang }}">
+                                                <img src="{{ asset('gambar_barang/' . $bv->GambarBarang) }}"
                                                     alt="">
-                                                {{ $bv->nama_barang }} -{{ $bv->deskripsi_barang }}
+                                                {{ $bv->NamaBarang }} -{{ $bv->Keterangan }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -118,23 +118,18 @@
 
         <div class="row">
             @foreach ($beverage as $bv)
-                <?php
-                $price = DB::table('tb_harga_barang')
-                    ->where('id_barang', $bv->id_barang)
-                    ->orderBy('tanggal_harga_barang_ditambah', 'DESC')
-                    ->first();
-                ?>
+               
                 <div class="col-sm-2 mt-2 mb-2">
                     <button
                         style="border: none; text-decoration: none; display: inline-block; background-color: #ffffff; border-radius: 0.5rem;"
-                        class="btn btnBeverage" value="{{ $bv->id_barang }}">
-                        <img src="{{ asset('gambar_barang/' . $bv->gambar_barang) }}" width="160" height="160">
-                        <h6 class="card-title mt-2">{{ $bv->nama_barang }}</h6>
+                        class="btn btnBeverage" value="{{ $bv->IdBarang }}">
+                        <img src="{{ asset('gambar_barang/' . $bv->GambarBarang) }}" width="160" height="160">
+                        <h6 class="card-title mt-2">{{ $bv->NamaBarang }}</h6>
                         <p class="card-text">
-                            Rp {{ number_format(ceil($price->harga_barang), 0, ',', '.') }}
+                            Rp {{ number_format(ceil($bv->HargaBarang), 0, ',', '.') }}
                         </p>
-                        <input type="hidden" id="harga_barang-{{ $bv->id_barang }}"
-                            value="{{ $price->harga_barang }}">
+                        <input type="hidden" id="HargaBarang-{{ $bv->IdBarang }}"
+                            value="{{ $bv->HargaBarang }}">
                     </button>
                 </div>
             @endforeach
@@ -168,14 +163,14 @@
                                 <p id="description" style="width: 350px;"></p>
                                 <div class="mt-2">
                                     <div class="col-md-6 col-lg-6 col-xl-5 d-flex">
-                                        <input type="hidden" id="id_barang" name="id_barang">
-                                        <input type="hidden" id="harga_barang" name="harga_barang">
+                                        <input type="hidden" id="IdBarang" name="IdBarang">
+                                        <input type="hidden" id="HargaBarang" name="HargaBarang">
 
                                         <input type="hidden" name="type_button" id="type_button">
                                         <button type="button" class="btn btn-link px-2" onclick="getNominalDown()">
                                             <i class="fas fa-minus"></i>
                                         </button>
-                                        <input id="total_barang" min="1" name="total_barang" value="0"
+                                        <input id="TotalBarang" min="1" name="TotalBarang" value="0"
                                             type="number" class="form-control text-center form-control-sm"
                                             onkeyup="getNominal()" />
                                         <button type="button" class="btn btn-link px-2" onclick="getNominalUp()">
@@ -203,21 +198,21 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function getNominal() {
-            var quantity = $('#total_barang').val();
+            var quantity = $('#TotalBarang').val();
             console.log(quantity)
-            var beverage_id = $('#id_barang').val();
-            var price = $('#harga_barang-' + beverage_id).val();
-            $('#harga_barang').val(quantity * response.beverage.harga_barang)
+            var beverage_id = $('#IdBarang').val();
+            var price = $('#HargaBarang-' + beverage_id).val();
+            $('#HargaBarang').val(quantity * response.beverage.HargaBarang)
 
         }
 
         function getNominalUp() {
-            var quantity = $('#total_barang').val();
-            var beverage_id = $('#id_barang').val();
-            var price = $('#harga_barang-' + beverage_id).val();
+            var quantity = $('#TotalBarang').val();
+            var beverage_id = $('#IdBarang').val();
+            var price = $('#HargaBarang-' + beverage_id).val();
             var newQty = parseInt(quantity) + 1;
-            $('#total_barang').val(newQty)
-            $('#harga_barang').val(newQty * price)
+            $('#TotalBarang').val(newQty)
+            $('#HargaBarang').val(newQty * price)
         }
 
 
@@ -234,20 +229,19 @@
                     url: "{{ url('item_beverage_request') }}/" + beverage_id,
                     success: function(response) {
                         document.getElementById("judul_barang").textContent = (response
-                            .beverage.nama_barang);
+                            .beverage.NamaBarang);
                         document.getElementById("price").textContent = ('Rp ' + parseInt(
-                            response.beverage.harga_barang).toLocaleString());
+                            response.beverage.HargaBarang).toLocaleString());
                         document.getElementById("description").textContent = (response.beverage
-                            .deskripsi_barang);
+                            .Keterangan);
 
-                        // $('#gambar_barang_edit').val(response.beverage.gambar_barang)
-                        $('#deskripsi_barang_edit').val(response.beverage
-                            .deskripsi_barang)
-                        $('#id_barang').val(response.beverage.id_barang)
-                        $('#total_barang').val(0)
+                        $('#Keterangan_edit').val(response.beverage
+                            .Keterangan)
+                        $('#IdBarang').val(response.beverage.IdBarang)
+                        $('#TotalBarang').val(0)
                         var get_file = '{{ asset('gambar_barang') }}/';
                         document.getElementById("beverage-image").src = get_file + response
-                            .beverage.gambar_barang;
+                            .beverage.GambarBarang;
 
                         getNominalUp();
                         console.log(response);
@@ -268,16 +262,16 @@
         });
 
         function getNominalDown() {
-            var quantity = $('#total_barang').val();
-            var beverage_id = $('#id_barang').val();
-            var price = $('#harga_barang-' + beverage_id).val();
+            var quantity = $('#TotalBarang').val();
+            var beverage_id = $('#IdBarang').val();
+            var price = $('#HargaBarang-' + beverage_id).val();
             var newQty = parseInt(quantity) - 1;
 
             alert(newQty);
             if (quantity != 1) {
 
-                $('#total_barang').val(newQty)
-                $('#harga_barang').val(newQty * price)
+                $('#TotalBarang').val(newQty)
+                $('#HargaBarang').val(newQty * price)
             }
 
         }
@@ -300,8 +294,8 @@
 
         $('#quantity').on('change', function() {
             //GET BEVERAGE TOTAL
-            var id_bev = $("#beverage_list").val();
-            if (id_bev == '') {
+            var Idbev = $("#beverage_list").val();
+            if (Idbev == '') {
                 $("#item_alert").css('display', '')
                 document.getElementById("quantity").value = '';
             } else {
@@ -317,7 +311,7 @@
 
         $('#beverage_list').on('change', function() {
             $('#alert_kosong').hide();
-            var id_bev = $(this).val();
+            var Idbev = $(this).val();
             var req_date = $("#request_date").val();
             if (req_date == '') {
                 $("#date_alert").css('display', '');
@@ -325,22 +319,22 @@
                 $("#request_date").addClass('border-red');
                 document.getElementById("beverage_list").value = '';
             } else {
-                var id_bev = $("#beverage_list").val();
+                var Idbev = $("#beverage_list").val();
                 $.ajax({
                     type: "POST",
                     url: "{{ url('get-bev-price') }}",
                     data: {
                         '_token': '{{ csrf_token() }}',
                         'req_date': req_date,
-                        'id_bev': id_bev,
+                        'Idbev': Idbev,
                     },
                     success: function(data) {
                         $.each(data, function(index, element) {
-                            var price_per_item = parseInt(element.harga_barang)
+                            var price_per_item = parseInt(element.HargaBarang)
                                 .toLocaleString();
                             document.getElementById("price_item").value = 'Rp. ' +
                                 price_per_item;
-                            document.getElementById("item_name").value = element.nama_barang;
+                            document.getElementById("item_name").value = element.NamaBarang;
                         });
                     }
                 });
@@ -351,12 +345,12 @@
 
         var no = 0 + 1;
         $('#add_item').on('click', function() {
-            var id_bev = $("#beverage_list").val();
+            var Idbev = $("#beverage_list").val();
             var item_name = $('#item_name').val();
             var qtt = $("#quantity").val();
             var price = $("#price_item").val();
             var total = $("#total_nominal").val();
-            if (id_bev == '' || qtt == '' || total == '') {
+            if (Idbev == '' || qtt == '' || total == '') {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -364,7 +358,7 @@
                 })
             } else {
                 var item = "<div class='row' id='item-" + no + "'>" +
-                    "<input type='hidden' name='id_barang[]' value='" + id_bev + "'>" +
+                    "<input type='hidden' name='IdBarang[]' value='" + Idbev + "'>" +
                     "<div class='col-sm-2 mt-2 text-center'>Item " + no + "</div>" +
                     "<div class='col-sm-2 mt-2 text-center'><input class='form-control2' value='" + item_name +
                     "' readonly></div>" +
@@ -372,7 +366,7 @@
                     qtt + "' readonly></div>" +
                     "<div class='col-sm-2 mt-2 text-center'><input class='form-control2' value='" + price +
                     "' readonly></div>" +
-                    "<div class='col-sm-2 mt-2 text-center'><input class='form-control2' name='harga_barang[]' value='" +
+                    "<div class='col-sm-2 mt-2 text-center'><input class='form-control2' name='HargaBarang[]' value='" +
                     total + "' readonly></div>" +
                     "<div class='col-sm-2 mt-2 text-center'><a onclick='remove(" + no +
                     ")' class='btn btn-sm rounded-pill btn-icon btn-danger'>" +

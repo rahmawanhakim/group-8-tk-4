@@ -38,12 +38,12 @@
                             <tr>
                                 <th class="text-center" style="widows: 5%;">No</th>
                                 <th style="width: 10%;">Name</th>
+                                <th style="width: 10%;">Satuan</th>
                                 <th style="width: 10%;">Gambar</th>
+                                
                                 <th style="width: 25%;">Deskripsi</th>
                                 <th style="width: 10%;">Stok</th>
                                 <th style="width: 10%;">Harga</th>
-                                <th style="width: 15%;">Tanggal Ditambah</th>
-                                <th style="width: 10%;">Ditambah Oleh</th>
                                 <th class="text-center" style="width: 10%;">Action</th>
                             </tr>
                         </thead>
@@ -55,49 +55,46 @@
                                 $no = $limit * $page - $limit; ?>
                                 @foreach ($data_barang as $item)
                                     <?php
-                                    $stock_in = DB::table('tb_transaksi')
-                                        ->join('tb_detail_transaksi as detail', 'detail.id_transaksi', 'tb_transaksi.id_transaksi')
-                                        ->where('detail.id_barang', $item->id_barang)
-                                        ->where('jenis_transaksi', 1)
-                                        ->where('status_transaksi', 2)
+                                    $stock_in = DB::table('transaksi')
+                                        ->join('detail_transaksi as detail', 'detail.IdTransaksi', 'transaksi.IdTransaksi')
+                                        ->where('detail.IdBarang', $item->IdBarang)
+                                        ->where('JenisTransaksi', 1)
+                                        ->where('StatusTransaksi', 2)
                                         ->get()
-                                        ->sum('total_barang');
+                                        ->sum('TotalBarang');
                                     
-                                    $stock_out = DB::table('tb_transaksi')
-                                        ->join('tb_detail_transaksi as detail', 'detail.id_transaksi', 'tb_transaksi.id_transaksi')
-                                        ->where('detail.id_barang', $item->id_barang)
-                                        ->where('jenis_transaksi', 0)
-                                        ->where('status_transaksi', 2)
+                                    $stock_out = DB::table('transaksi')
+                                        ->join('detail_transaksi as detail', 'detail.IdTransaksi', 'transaksi.IdTransaksi')
+                                        ->where('detail.IdBarang', $item->IdBarang)
+                                        ->where('JenisTransaksi', 0)
+                                        ->where('StatusTransaksi', 2)
                                         ->get()
-                                        ->sum('total_barang');
+                                        ->sum('TotalBarang');
                                     
                                     $total_stock = $stock_in - $stock_out;
                                     
-                                    $data_harga_barang = DB::table('tb_harga_barang')
-                                        ->select('harga_barang')
-                                        ->where('id_barang', $item->id_barang)
-                                        ->orderBy('id_harga_barang', 'DESC')
-                                        ->first();
                                     ?>
 
                                     <tr>
                                         <td class="text-center p-2">{{ ++$no }}</td>
                                         <td class="p-2">
-                                            <a href="{{ url('harga-barang/' . $item->id_barang) }}">{{ $item->nama_barang }}</a>
+                                            <a
+                                                >{{ $item->NamaBarang }}</a>
+                                        </td>
+                                        <td class="p-2">
+                                                {{ $item->SatuanBarang }}
                                         </td>
                                         <td class="p-2">
                                             <img style="width: 60px;"
-                                                src="{{ asset('gambar_barang/' . $item->gambar_barang) }}">
+                                                src="{{ asset('gambar_barang/' . $item->GambarBarang) }}">
                                         </td>
                                         <?php
-                                        $kata = DB::table('tb_barang')
-                                            ->where(DB::raw('LENGTH(deskripsi_barang)'), '>', '50')
-                                            ->get();
+                                        $kata = DB::table('barang')->where(DB::raw('LENGTH(Keterangan)'), '>', '50')->get();
                                         ?>
 
                                         <td class="p-2">
                                             <p style="white-space:normal ;">
-                                                   {{ $item->deskripsi_barang }}
+                                                {{ $item->Keterangan }}
                                             </p>
                                         </td>
                                         <td class="p-2">
@@ -113,24 +110,23 @@
                                             @endif
                                         </td>
                                         <td class="p-2">
-                                            @if ($data_harga_barang != null)
-                                                {{ 'Rp. ' . number_format(ceil($data_harga_barang->harga_barang), 0, ',', '.') }}
-                                            @else
-                                                <span class="badge bg-label-danger">Harga Barang Kosong</span>
-                                            @endif
+                                            {{ 'Rp. ' . number_format(ceil($item->HargaBarang), 0, ',', '.') }}
                                         </td>
-                                        <td class="p-2">{{ date('j M Y', strtotime($item->tanggal_barang_ditambah)) }}
-                                        </td>
-                                        <td class="p-2">{{ $item->updated_by }}</td>
                                         <td class="text-center p-2">
-                                            <button type="button" value="{{ $item->id_barang }}"
+                                            <button type="button" value="{{ $item->IdBarang }}"
                                                 class="btn rounded-pill btn-icon btn-danger deleteBtn">
                                                 <span class="fas fa-trash-alt fa-2xs"></span>
                                             </button>
-                                            <button type="button" value="{{ $item->id_barang }}"
+                                            <button type="button" value="{{ $item->IdBarang }}"
                                                 class="btn rounded-pill btn-icon btn-warning ms-2 editBtn">
                                                 <span class="fas fa-edit fa-2xs"></span>
                                             </button>
+                                            @if($IdAkses != 2)
+                                            <a href="{{ url('tambah-stok-barang/' . $item->IdBarang) }}" type="button" value="{{ $item->IdBarang }}"
+                                                class="btn rounded-pill btn-icon btn-info ms-2 plusBtn">
+                                                <span class="fas fa-plus fa-2xs"></span>
+                                            </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -206,21 +202,35 @@
                             <div class="row mb-3">
                                 <label class="col-sm-4 col-form-label">Nama Barang</label>
                                 <div class="col-sm-8">
-                                    <input id="nama_barang" required name="nama_barang" type="text"
+                                    <input id="NamaBarang" required name="NamaBarang" type="text"
                                         class="form-control" placeholder="Masukkan name barang">
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <label class="col-sm-4 col-form-label">Gambar Barang</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" type="file" id="gambar_barang" name="gambar_barang"
+                                    <input class="form-control" type="file" id="GambarBarang" name="GambarBarang"
+                                        required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-sm-4 col-form-label">Satuan Barang</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" type="text" id="SatuanBarang"
+                                        name="SatuanBarang">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-sm-4 col-form-label">Harga Barang</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" type="number" id="HargaBarang" name="HargaBarang"
                                         required>
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <label class="col-sm-4 col-form-label">Deskripsi Barang</label>
                                 <div class="col-sm-8">
-                                    <textarea class="form-control" id="deskripsi_barang" required name="deskripsi_barang" rows="3"
+                                    <textarea class="form-control" id="Keterangan" required name="Keterangan" rows="3"
                                         placeholder="Masukkan Deskripsi barang"></textarea>
                                 </div>
                             </div>
@@ -249,26 +259,41 @@
                         <div class="modal-body">
                             @csrf
                             <div class="row mb-3">
-                                <label class="col-sm-4 col-form-label">barang Name</label>
+                                <label class="col-sm-4 col-form-label">Nama Barang</label>
                                 <div class="col-sm-8">
-                                    <input id="nama_barang_edit" name="nama_barang_edit" type="text"
+                                    <input id="NamaBarang_edit" name="NamaBarang_edit" type="text"
                                         class="form-control" placeholder="Insert barang Name">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label class="col-sm-4 col-form-label">barang Image</label>
+                                <label class="col-sm-4 col-form-label">Gambar Barang</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" type="file" id="gambar_barang_edit" name="gambar_barang_edit">
+                                    <input class="form-control" type="file" id="GambarBarang_edit"
+                                        name="GambarBarang_edit">
+                                </div>
+                            </div> 
+                            <div class="row mb-3">
+                                <label class="col-sm-4 col-form-label">Satuan Barang</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" type="text" id="SatuanBarang_edit"
+                                        name="SatuanBarang_edit">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label class="col-sm-4 col-form-label">barang Description</label>
+                                <label class="col-sm-4 col-form-label">Harga Barang</label>
                                 <div class="col-sm-8">
-                                    <textarea class="form-control" id="deskripsi_barang_edit" name="deskripsi_barang_edit"
+                                    <input class="form-control" type="number" id="HargaBarang_edit" name="HargaBarang_edit"
+                                        required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-sm-4 col-form-label">Deskripsi Barang</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" id="Keterangan_edit" name="Keterangan_edit"
                                         placeholder="Insert barang Description" rows="3"></textarea>
                                 </div>
                             </div>
-                            <input type="hidden" name="id_barang" id="id_barang">
+                            <input type="hidden" name="IdBarang" id="IdBarang">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -295,7 +320,7 @@
                             @csrf
                             <label for="company_name" class="form-label" style="text-transform: uppercase">Are you sure
                                 want to delete <span id="name_barang" style="font-weight:bold"></span>?</label>
-                            <input type="hidden" name="id_barang_delete" id="id_barang_delete">
+                            <input type="hidden" name="IdBarang_delete" id="IdBarang_delete">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -325,7 +350,7 @@
                         success: function(response) {
                             console.log(response)
                             document.getElementById("description").textContent = (response.barang
-                                .deskripsi_barang);
+                                .Keterangan);
                         }
                     })
                 })
@@ -337,19 +362,21 @@
                     var barang_id = $(this).val();
                     console.log(barang_id);
 
-                    $('#modalUpdate').modal('show')
+                    $('#modalUpdate').modal('show');
 
                     $.ajax({
                         type: 'GET',
                         url: "{{ url('item_edit_barang') }}/" + barang_id,
                         success: function(response) {
                             console.log(response)
-                            $('#nama_barang_edit').val(response.barang
-                                .nama_barang)
+                            $('#NamaBarang_edit').val(response.barang
+                                .NamaBarang)
                             // $('#gambar_barang_edit').val(response.barang.gambar_barang)
-                            $('#deskripsi_barang_edit').val(response.barang
-                                .deskripsi_barang)
-                            $('#id_barang').val(response.barang.id_barang)
+                            $('#Keterangan_edit').val(response.barang
+                                .Keterangan)
+                            $('#IdBarang').val(response.barang.IdBarang)
+                            $('#SatuanBarang_edit').val(response.barang.SatuanBarang)
+                            $('#HargaBarang_edit').val(response.barang.HargaBarang)
                         }
                     })
                 })
@@ -366,13 +393,13 @@
 
                     $.ajax({
                         type: 'GET',
-                        url: "{{ url('item_delete_barang') }}/" + barang_id,
+                        url: "{{ url('item_edit_barang') }}/" + barang_id,
                         success: function(response) {
                             // console.log(response);
-                            $('#id_barang_delete').val(response.delete.id_barang)
+                            $('#IdBarang_delete').val(response.barang.IdBarang)
                             document.getElementById("name_barang").textContent =
-                                response.delete
-                                .nama_barang;
+                                response.barang
+                                .NamaBarang;
                         }
                     })
                 })
@@ -382,13 +409,13 @@
 
             $(document).ready(function() {
                 $(".btn_display").click(function() {
-                    var id_barang = $(this).val();
+                    var IdBarang = $(this).val();
 
                     $.ajax({
                         type: "GET",
-                        url: "{{ url('barang_image/') }}/" + id_barang,
+                        url: "{{ url('barang_image/') }}/" + IdBarang,
                         success: function(data) {
-                            $('#id_barang').val(data.barang.id_barang)
+                            $('#IdBarang').val(data.barang.IdBarang)
                             var get_file = '{{ asset('barang_image') }}/';
                             if (data.barang.gambar_barang == null) {
                                 alert('No Receipt Image');

@@ -3,9 +3,7 @@
     <div class="container-xxl flex-grow-1 container-p-y">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-style1">
-                <li class="breadcrumb-item {{ $title == 'Dashboard' ? 'active' : '' }}">
-                    <a href="{{ url('dashboard') }}">Dashboard</a>
-                </li>
+                
                 <li
                     class="breadcrumb-item {{ $title == 'Beverage Request List' || $title == 'Beverage History' ? 'active' : '' }}">
                     <a href="{{ url('beverage-request-list') }}">{{ $title }}</a>
@@ -62,9 +60,9 @@
                                     $no = $limit * $page - $limit; ?>
                                     @foreach ($data_beverage_request as $item)
                                         <?php
-                                        $data_barang = DB::table('tb_detail_transaksi')
-                                            ->join('tb_barang', 'tb_barang.id_barang', 'tb_detail_transaksi.id_barang')
-                                            ->where('id_transaksi', $item->id_transaksi)
+                                        $data_barang = DB::table('detail_transaksi')->select('barang.NamaBarang', 'detail_transaksi.*')
+                                            ->join('barang', 'barang.IdBarang', 'detail_transaksi.IdBarang')
+                                            ->where('IdTransaksi', $item->IdTransaksi)
                                             ->get();
                                         
                                         $total_tabel = $data_barang->count();
@@ -76,11 +74,11 @@
                                                 {{ ++$no }}</td>
                                             <td class="text-center" rowspan="{{ $total_tabel + 1 }}"
                                                 style="text-align: center">
-                                                {{ $item->nama_pengguna == null ? 'Admin' : $item->nama_pengguna }}</td>
+                                                {{ $item->NamaDepan . ' ' . $item->NamaBelakang  }} </td>
 
                                             <td class="text-center fw-bold" rowspan="{{ $total_tabel + 1 }}"
                                                 style="width: 15%">
-                                                {{ date('j M Y ', strtotime($item->tanggal_transaksi_ditambah)) }}
+                                                {{ date('j M Y ', strtotime($item->TanggalTransaksiDitambah)) }}
                                             </td>
                                         </tr>
 
@@ -94,16 +92,16 @@
                                                     {{ ++$no_item }}</td>
                                                 <td class="text-center fw-bold"
                                                     style="text-transform:uppercase; width: 15%">
-                                                    {{ $i->nama_barang }}</td>
-                                                <td class="text-center" style="width: 15%">{{ $i->total_barang }}
+                                                    {{ $i->NamaBarang }}</td>
+                                                <td class="text-center" style="width: 15%">{{ $i->TotalBarang }}
                                                     pcs
                                                 </td>
                                                 <td class="text-center" style="width: 15%">
                                                     {{-- {{ 'Rp. ' . number_format($i->beverage_price, 0, ',', '.') }} --}}
-                                                    {{ 'Rp. ' . number_format($i->harga_barang / $i->total_barang, 0, ',', '.') }}
+                                                    {{ 'Rp. ' . number_format($i->HargaBarang / $i->TotalBarang, 0, ',', '.') }}
                                                 </td>
                                                 <td class="text-center" style="width: 15%">
-                                                    {{ 'Rp. ' . number_format($i->harga_barang, 0, ',', '.') }}
+                                                    {{ 'Rp. ' . number_format($i->HargaBarang, 0, ',', '.') }}
                                                 </td>
                                                 @if ($no_item == 1)
                                                     <td class="text-center" rowspan="{{ $total_tabel }}"
@@ -119,7 +117,7 @@
                                                     <td class="text-center" rowspan="{{ $total_tabel }}"
                                                         style="width: 15%">
 
-                                                        <button type="button" class="btn btn-danger" value="{{ $item->id_transaksi }}" id="buttonCancel">
+                                                        <button type="button" class="btn btn-danger" value="{{ $item->IdTransaksi }}" id="buttonCancel">
                                                            Batalkan
                                                         </button>
 
@@ -187,7 +185,7 @@
                     <div class="modal-body">
                         <label for="company_name" class="form-label" style="text-transform: uppercase">Apakah Anda Yakin
                             Akan Menghapus Pesanan Ini ?</label>
-                        <input type="hidden" id="id_transaksi" name="id_transaksi">
+                        <input type="hidden" id="IdTransaksi" name="IdTransaksi">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -212,10 +210,10 @@
          
 
             $(document).on('click', '#buttonCancel', function() {
-                var id_transaksi = $(this).val();
+                var IdTransaksi = $(this).val();
                 $('#batalkanModal').modal('show')
 
-                $('#id_transaksi').val(id_transaksi)
+                $('#IdTransaksi').val(IdTransaksi)
             });
 
             // $(document).on('click', '#CancelWaiting', function() {
@@ -226,8 +224,8 @@
             //         url: '{{ url('item_update_beverage_transaction') }}/' + beverage_id,
             //         success: function(response) {
             //             console.log(response)
-            //             $('#id_beverage_transaction_change_pending').val(response
-            //                 .request_beverage.id_beverage_transaction)
+            //             $('#Idbeverage_transaction_change_pending').val(response
+            //                 .request_beverage.Idbeverage_transaction)
             //         }
             //     })
             // })
@@ -235,7 +233,7 @@
         // END EDIT beverage
 
         // function getPrice() {
-        //     var select_beverage = $('#id_beverage').val();
+        //     var select_beverage = $('#Idbeverage').val();
         //     var total = $('#beverage_quantity').val();
         //     $.ajax({
         //         type: 'GET',
@@ -248,7 +246,7 @@
         // }
 
         // function getPriceEdit() {
-        //     var select_beverage_edit = $('#id_beverage_edit').val();
+        //     var select_beverage_edit = $('#Idbeverage_edit').val();
         //     var total_edit = $('#beverage_quantity_edit').val();
         //     $.ajax({
         //         type: 'GET',

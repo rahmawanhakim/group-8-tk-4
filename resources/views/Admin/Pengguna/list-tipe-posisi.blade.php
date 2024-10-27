@@ -39,24 +39,28 @@
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Tipe Posisi</th>
+                                <th>Nama Akses</th>
+                                <th>Keterangan</th>
                                 <th>Total Pengguna</th> 
                             </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
-                            @if ($data_tipe_posisi != null)
+                            @if ($data_hakakses != null)
                                 <?php $limit = isset($_GET['limit']) ? $_GET['limit'] : request('sortir');
                                 $page = isset($_GET['page']) ? $_GET['page'] : 1;
                                 $no = $limit * $page - $limit; ?>
 
-                                @foreach ($data_tipe_posisi as $item)
+                                @foreach ($data_hakakses as $item)
 
                                 <?php
-                                $total = DB::table('tb_pengguna')->where('id_tipe_posisi', $item->id_tipe_posisi)->get()->count();
+                                $total = DB::table('pengguna')->where('IdAkses', $item->IdAkses)->get()->count();
                                 ?>
                                     <tr style="text-align: left;">
                                         <td>{{ ++$no }}</td>
-                                        <td><a href="{{ url('pengguna/' . $item->id_tipe_posisi) }}">{{ $item->nama_posisi }}</a></td>
+                                        <td><a href="{{ url('pengguna/' . $item->IdAkses) }}">{{ $item->NamaAkses }}</a></td>
+                                        <td>
+                                            {{ $item->Keterangan }}
+                                        </td>
                                         <td>
                                             {{ $total }}
                                         </td>
@@ -116,7 +120,7 @@
                         $.each(data, function(key, val) {
                             items.push(val);
                         });
-                        $('#id_user').val('');
+                        $('#Iduser').val('');
                         $('#admin-radio').hide();
                         response(items);
                     });
@@ -124,7 +128,7 @@
                 minLength: 2,
                 select: function(request, response) {
                     $('#autocomplete_user').val(response.item.label);
-                    $('#id_user').val(response.item.id);
+                    $('#Iduser').val(response.item.id);
                     $('#admin-radio').show();
                 }
             });
@@ -137,7 +141,7 @@
                 url: "{{ url('get-item-user') }}/" + id,
                 success: function(data) {
                     // console.log(data);
-                    $('#id_user_role_delete').val(data.data.id_role_user);
+                    $('#Iduser_role_delete').val(data.data.Idrole_user);
                     document.getElementById('user_name').textContent = data.data.user_full_name;
                 }
             });
@@ -151,12 +155,12 @@
                 url: "{{ url('get-item-user') }}/" + id,
                 success: function(data) {
                     console.log(data);
-                    $('#id_role_user_edit').val(data.data.id_role_user);
+                    $('#Idrole_user_edit').val(data.data.Idrole_user);
                     $('#user_name_edit').val(data.data.user_full_name);
-                    if (data.data.id_employee != '') {
+                    if (data.data.Idemployee != '') {
                         $('#admin-radio-edit').show();
                     }
-                    if (data.data.id_role == '1') {
+                    if (data.data.Idrole == '1') {
                         document.getElementById("role_user_edit").checked = true;
                     } else {
                         document.getElementById("role_user_edit2").checked = true;
@@ -171,7 +175,7 @@
         //         type: "GET",
         //         url: "{{ url('get-card') }}/" + id,
         //         success: function(data) {
-        //             $('#id_card_delete').val(data.id_card);
+        //             $('#Idcard_delete').val(data.Idcard);
         //         }
         //     });
         // });

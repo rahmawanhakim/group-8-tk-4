@@ -8,10 +8,10 @@
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>{{ $title }} | Trifecta</title>
+    <title>{{ $title }} | Group 8</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/jic/trifecta.PNG') }}" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/jic/logo.png') }}" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -212,8 +212,8 @@
                 </div>
                 <div class="logo-details">
                     {{-- <i class="bx bxl-c-plus-plus"></i> --}}
-                    <img class="img-xs" src="{{ asset('assets/img/jic/trifecta.png') }}" alt="">
-                    <h5 class="logo_name">Trifecta</h5>
+                    <img class="img-xs" src="{{ asset('assets/img/jic/logo.png') }}" alt="">
+                    <h5 class="logo_name">Group 8</h5>
                     {{-- <img src="{{ asset('assets/img/jic/jic.png') }}" style="width:140px;" alt=""> --}}
                 </div>
                 <ul class="nav-links">
@@ -240,10 +240,10 @@
             </div>
             <!-- / Menu -->
             <?php
-            $bev_cart = DB::table('tb_detail_transaksi')
-                ->join('tb_barang', 'tb_barang.id_barang', 'tb_detail_transaksi.id_barang')
-                ->where('id_pengguna', $id_pengguna)
-                ->where('id_transaksi', 0)
+            $bev_cart = DB::table('detail_transaksi')
+                ->join('barang', 'barang.IdBarang', 'detail_transaksi.IdBarang')
+                ->where('IdPengguna', $IdPengguna)
+                ->where('IdTransaksi', 0)
                 ->get();
             
             $total_cart = $bev_cart->count();
@@ -354,7 +354,7 @@
                 <form action="{{ route('logout') }}" method="GET" enctype="multipart/form-data">
                     <div class="modal-body">
                         @csrf
-                        <input type="hidden" name="id_req_cancel" id="id_req_cancel" value="">
+                        <input type="hidden" name="Idreq_cancel" id="Idreq_cancel" value="">
                         Are you sure you want to logout ?
                     </div>
                     <div class="modal-footer">
@@ -390,58 +390,58 @@
                                 @foreach ($bev_cart as $bevrg)
                                     <?php
                                     
-                                    $bev_total_nominal = DB::table('tb_detail_transaksi')
-                                        ->where('id_barang', $bevrg->id_barang)
-                                        ->where('id_pengguna', $id_pengguna)
-                                        ->where('id_transaksi', 0)
+                                    $bev_total_nominal = DB::table('detail_transaksi')
+                                        ->where('IdBarang', $bevrg->IdBarang)
+                                        ->where('IdPengguna', $IdPengguna)
+                                        ->where('IdTransaksi', 0)
                                         ->get()
-                                        ->sum('harga_barang');
-                                    $bev_total_qty =DB::table('tb_detail_transaksi')
-                                        ->where('id_barang', $bevrg->id_barang)
-                                        ->where('id_pengguna', $id_pengguna)
-                                        ->where('id_transaksi', 0)
+                                        ->sum('HargaBarang');
+                                    $bev_total_qty =DB::table('detail_transaksi')
+                                        ->where('IdBarang', $bevrg->IdBarang)
+                                        ->where('IdPengguna', $IdPengguna)
+                                        ->where('IdTransaksi', 0)
                                         ->get()
-                                        ->sum('total_barang');
+                                        ->sum('TotalBarang');
                                     ?>
                                     <div class="row d-flex justify-content-between align-items-center">
                                         <div class="col-md-2 col-lg-2 col-xl-2">
-                                            <img src="{{ asset('gambar_barang/' . $bevrg->gambar_barang) }}"
+                                            <img src="{{ asset('gambar_barang/' . $bevrg->GambarBarang) }}"
                                                 width="160" height="160">
                                         </div>
                                         <div class="col-md-3 col-lg-3 col-xl-3">
-                                            <h5 class="mb-2">{{ $bevrg->nama_barang }}</h5>
-                                            <h6>{{ $bevrg->deskripsi_barang }}</h6>
+                                            <h5 class="mb-2">{{ $bevrg->NamaBarang }}</h5>
+                                            <h6>{{ $bevrg->Keterangan }}</h6>
                                         </div>
-                                        <input type="hidden" name="id_beverage_no[]" id="id_beverage_no"
-                                            value="{{ $bevrg->id_barang}}">
-                                        <input type="hidden" name="id_detail_transaksi[]"
-                                            id="id_detail_transaksi"
-                                            value="{{ $bevrg->id_detail_transaksi }}">
+                                        <input type="hidden" name="Idbeverage_no[]" id="Idbeverage_no"
+                                            value="{{ $bevrg->IdBarang}}">
+                                        <input type="hidden" name="IdDetailTransaksi[]"
+                                            id="IdDetailTransaksi"
+                                            value="{{ $bevrg->IdDetailTransaksi }}">
                                         <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
                                             <button type="button" class="btnDown btn px-2"
-                                                onclick="getNominalDownList('{{ $bevrg->id_barang}}')">
+                                                onclick="getNominalDownList('{{ $bevrg->IdBarang}}')">
                                                 <i class="fas fa-minus"></i>
                                             </button>
                                             <input min="0"
-                                                id="total_barang-{{ $bevrg->id_barang}}"
-                                                name="total_barang[]" type="number"
+                                                id="TotalBarang-{{ $bevrg->IdBarang}}"
+                                                name="TotalBarang[]" type="number"
                                                 value="{{ $bev_total_qty }}"
-                                                onkeyup="getNominalList('{{ $bevrg->id_barang}}')"
+                                                onkeyup="getNominalList('{{ $bevrg->IdBarang}}')"
                                                 class="form-control form-control-sm" />
                                             <button type="button" class="btnUp btn px-2"
-                                                onclick="getNominalUpList('<?= $bevrg->id_barang?>')">
+                                                onclick="getNominalUpList('<?= $bevrg->IdBarang?>')">
                                                 <i class="fas fa-plus"></i>
                                             </button>
                                         </div>
                                         <div class="col-md-3 col-lg-2 col-xl-2">
                                             <input class="col-sm-10" style="border:none; " readonly
-                                                id="harga_barang-{{ $bevrg->id_barang}}"
+                                                id="HargaBarangChart-{{ $bevrg->IdBarang}}"
                                                 value="{{ 'Rp. ' . number_format(ceil($bev_total_nominal), 0, ',', '.') }}"
-                                                name="harga_barang[]">
+                                                name="HargaBarang[]">
                                         </div>
                                         <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                                            <button type="button" onclick="hapus({{ $bevrg->id_detail_transaksi }})"
-                                                value="{{ $bevrg->id_detail_transaksi }}"
+                                            <button type="button" onclick="hapus({{ $bevrg->IdDetailTransaksi }})"
+                                                value="{{ $bevrg->IdDetailTransaksi }}"
                                                 class="btnDeleteCart btn btn-danger"><span
                                                     class="fas fa-trash fa-lg"></span></button>
                                         </div>
@@ -472,7 +472,7 @@
 <div>
     <form method="POST" action="{{ route('delete_cart') }}" id="form_delete_cart" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="id_detail_transaksi_delete" id="id_detail_transaksi_delete">
+        <input type="hidden" name="IdDetailTransaksi_delete" id="IdDetailTransaksi_delete">
     </form>
 </div>
 
@@ -515,7 +515,7 @@
     $(document).ready(function() {
         $(document).on('click', '.btnDeleteCart', function() {
             var detail_id = $(this).val();
-            $('#id_beverage_detail_delete').val(detail_id);
+            $('#Idbeverage_detail_delete').val(detail_id);
             $('#form_delete_cart').submit();
         });
     });
@@ -535,18 +535,18 @@
     });
 </script>
 <script>
-    function getNominalDownList(id_beverage) {
-        var beverage_id = id_beverage;
-        var quantity = $('#total_barang-' + beverage_id).val();
+    function getNominalDownList(Idbeverage) {
+        var beverage_id = Idbeverage;
+        var quantity = $('#TotalBarang-' + beverage_id).val();
         if (quantity != 1) {
-            $('#total_barang-' + beverage_id).val(parseInt(quantity) - 1)
+            $('#TotalBarang-' + beverage_id).val(parseInt(quantity) - 1)
 
             $.ajax({
                 type: 'GET',
                 url: "{{ url('item_beverage_request') }}/" + beverage_id,
                 success: function(response) {
-                    $('#harga_barang-' + beverage_id).val('Rp. ' +
-                        parseInt((parseInt(quantity) - 1) * response.beverage.harga_barang)
+                    $('#HargaBarangChart-' + beverage_id).val('Rp. ' +
+                        parseInt((parseInt(quantity) - 1) * response.beverage.HargaBarang)
                         .toLocaleString());
                 }
             })
@@ -555,39 +555,42 @@
 
     function hapus(id){
         // alert(id);
-        $('#id_detail_transaksi_delete').val(id);
+        $('#IdDetailTransaksi_delete').val(id);
         $('#form_delete_cart').submit()
     }
 
-    function getNominalList(id_beverage) {
+    function getNominalList(Idbeverage) {
         // console.log(quantity)
-        var beverage_id = id_beverage;
-        var quantity = $('#total_barang-' + beverage_id).val();
+        var beverage_id = Idbeverage;
+        var quantity = $('#TotalBarang-' + beverage_id).val();
         console.log(quantity);
         $.ajax({
             type: 'GET',
             url: "{{ url('item_beverage_request') }}/" + beverage_id,
             success: function(response) {
-                $('#harga_barang-' + beverage_id).val('Rp. ' + (quantity * response.beverage
-                        .harga_barang)
+                $('#HargaBarangChart-' + beverage_id).val('Rp. ' + (quantity * response.beverage
+                        .HargaBarang)
                     .toLocaleString());
             }
         })
     }
 
-    function getNominalUpList(id_beverage) {
+    function getNominalUpList(Idbeverage) {
 
-        var beverage_id = id_beverage;
-        var quantity = $('#total_barang-' + beverage_id).val();
+        
+        var beverage_id = Idbeverage;
+        var quantity = $('#TotalBarang-' + beverage_id).val();
         var new_qty = parseInt(quantity) + 1;
-        $('#total_barang-' + beverage_id).val(new_qty);
+
+
+        $('#TotalBarang-' + beverage_id).val(new_qty);
 
         $.ajax({
             type: 'GET',
             url: "{{ url('item_beverage_request') }}/" + beverage_id,
             success: function(response) {
-                $('#harga_barang-' + beverage_id).val('Rp. ' +
-                    parseInt((parseInt(quantity) + 1) * response.beverage.harga_barang)
+                $('#HargaBarangChart-' + beverage_id).val('Rp. ' +
+                    parseInt((parseInt(quantity) + 1) * response.beverage.HargaBarang)
                     .toLocaleString());
             }
         });
