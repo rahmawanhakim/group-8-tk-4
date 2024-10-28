@@ -216,49 +216,7 @@
                 $('#IdTransaksi').val(IdTransaksi)
             });
 
-            // $(document).on('click', '#CancelWaiting', function() {
-            //     var beverage_id = $(this).val();
-            //     $('#modalChangeToPending').modal('show')
-            //     $.ajax({
-            //         type: 'GET',
-            //         url: '{{ url('item_update_beverage_transaction') }}/' + beverage_id,
-            //         success: function(response) {
-            //             console.log(response)
-            //             $('#Idbeverage_transaction_change_pending').val(response
-            //                 .request_beverage.Idbeverage_transaction)
-            //         }
-            //     })
-            // })
         });
-        // END EDIT beverage
-
-        // function getPrice() {
-        //     var select_beverage = $('#Idbeverage').val();
-        //     var total = $('#beverage_quantity').val();
-        //     $.ajax({
-        //         type: 'GET',
-        //         url: '{{ url('item_beverage_select') }}/' + select_beverage,
-        //         success: function(response) {
-        //             $('#beverage_nominal_add').val('Rp. ' + parseInt(response.beverage_data.beverage_price *
-        //                 total).toLocaleString());
-        //         }
-        //     })
-        // }
-
-        // function getPriceEdit() {
-        //     var select_beverage_edit = $('#Idbeverage_edit').val();
-        //     var total_edit = $('#beverage_quantity_edit').val();
-        //     $.ajax({
-        //         type: 'GET',
-        //         url: '{{ url('item_beverage_select') }}/' + select_beverage_edit,
-        //         success: function(response) {
-
-        //             $('#beverage_nominal_edit').val('Rp. ' + parseInt(response.beverage_data.beverage_price *
-        //                 total_edit).toLocaleString());
-        //         }
-        //     })
-        // }
-
         var strQuery, strUrlParams, nSearch, nPaginatorSelected;
         $(document).ready(function() {
 
@@ -289,14 +247,6 @@
             $('#sortir').val(nValue);
             $('#search_form').submit();
         });
-
-        // $(".reset_filter").click(function() {
-        //     $('#status').val('')
-        //     $('#start_date').val('');
-        //     $('#end_date').val('');
-        //     $('#sortir').val('');
-        //     $('#search_form').submit();
-        // });
 
         $('#btnSearch').click(function() {
             var search = $(this).val();

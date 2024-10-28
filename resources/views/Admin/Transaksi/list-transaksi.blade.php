@@ -192,67 +192,14 @@
         </div>
     </div>
 
-    {{-- CHANGE STATUS TO FINISH --}}
-
-    {{-- <div class="modal fade" id="modalChangeToPending" tabindex="-1" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalCenterTitle">Change Status Request Beverage</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="" method="POST"
-                    enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                        <label for="company_name" class="form-label" style="text-transform: uppercase">Change This
-                            Status To Finish ?</label>
-                        <input type="hidden" id="Idbeverage_transaction_change_pending"
-                            name="Idbeverage_transaction_change_pending">
-                        <input type="hidden" value="3" id="beverage_status_to_pending"
-                            name="beverage_status_to_pending">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            Cancel
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            Change
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div> --}}
+   
 @endsection
 @section('js')
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // EDIT FLOOR
         $(document).ready(function() {
-            // $(document).on('click', '.editBtn', function() {
-            //     var beverage_id = $(this).val();
-            //     $('#modalUpdate').modal('show')
-            //     $.ajax({
-            //         type: "GET",
-            //         url: "{{ url('item_update_beverage_transaction/') }}/" + beverage_id,
-            //         success: function(response) {
-            //             console.log(response)
-            //             $('#Idbeverage_edit').val(response.detail_beverage.Idbeverage)
-            //             $('#Idbeverage_transaction_detail').val(response.detail_beverage
-            //                 .Idbeverage_transaction_detail)
-            //             $('#beverage_nominal_edit').val('Rp. ' + parseInt(response
-            //                 .detail_beverage.beverage_nominal).toLocaleString())
-            //             $('#beverage_quantity_edit').val(response.detail_beverage
-            //                 .beverage_quantity)
-            //             $('#beverage_status').val(response.request_beverage.beverage_status)
-            //             $('#beverage_request_date_edit').val(response.request_beverage
-            //                 .beverage_request_date)
-            //             $('#Idbeverage_transaction').val(response.request_beverage
-            //                 .Idbeverage_transaction)
-            //         }
-            //     })
-            // })
+          
 
             $(document).on('click', '#buttonPending', function() {
                 var IdTransaksi = $(this).val();
@@ -261,48 +208,9 @@
                 $('#IdTransaksi').val(IdTransaksi)
             });
 
-            // $(document).on('click', '#buttonWaiting', function() {
-            //     var beverage_id = $(this).val();
-            //     $('#modalChangeToPending').modal('show')
-            //     $.ajax({
-            //         type: 'GET',
-            //         url: '{{ url('item_update_beverage_transaction') }}/' + beverage_id,
-            //         success: function(response) {
-            //             console.log(response)
-            //             $('#Idbeverage_transaction_change_pending').val(response
-            //                 .request_beverage.Idbeverage_transaction)
-            //         }
-            //     })
-            // })
+          
         });
-        // END EDIT beverage
-
-        // function getPrice() {
-        //     var select_beverage = $('#Idbeverage').val();
-        //     var total = $('#beverage_quantity').val();
-        //     $.ajax({
-        //         type: 'GET',
-        //         url: '{{ url('item_beverage_select') }}/' + select_beverage,
-        //         success: function(response) {
-        //             $('#beverage_nominal_add').val('Rp. ' + parseInt(response.beverage_data.beverage_price *
-        //                 total).toLocaleString());
-        //         }
-        //     })
-        // }
-
-        // function getPriceEdit() {
-        //     var select_beverage_edit = $('#Idbeverage_edit').val();
-        //     var total_edit = $('#beverage_quantity_edit').val();
-        //     $.ajax({
-        //         type: 'GET',
-        //         url: '{{ url('item_beverage_select') }}/' + select_beverage_edit,
-        //         success: function(response) {
-
-        //             $('#beverage_nominal_edit').val('Rp. ' + parseInt(response.beverage_data.beverage_price *
-        //                 total_edit).toLocaleString());
-        //         }
-        //     })
-        // }
+       
 
         var strQuery, strUrlParams, nSearch, nPaginatorSelected;
         $(document).ready(function() {
@@ -335,14 +243,7 @@
             $('#search_form').submit();
         });
 
-        // $(".reset_filter").click(function() {
-        //     $('#status').val('')
-        //     $('#start_date').val('');
-        //     $('#end_date').val('');
-        //     $('#sortir').val('');
-        //     $('#search_form').submit();
-        // });
-
+      
         $('#btnSearch').click(function() {
             var search = $(this).val();
             submitFilter(search);

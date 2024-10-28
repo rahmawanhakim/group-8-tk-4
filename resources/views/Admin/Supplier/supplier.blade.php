@@ -5,10 +5,6 @@
             z-index: 9999999 !important;
         }
 
-        /* .select {
-                                                                                                                        color: red;
-                                                                                                                    } */
-
         .select2 {
             z-index: 9999999 !important;
         }
@@ -213,29 +209,6 @@
     <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(function() {
-            $('#autocomplete_user').autocomplete({
-                source: function(request, response) {
-
-                    $.getJSON("{{ url('get-user') }}/" + request.term, function(data) {
-                        var items = [];
-
-                        $.each(data, function(key, val) {
-                            items.push(val);
-                        });
-                        $('#Iduser').val('');
-                        $('#admin-radio').hide();
-                        response(items);
-                    });
-                },
-                minLength: 2,
-                select: function(request, response) {
-                    $('#autocomplete_user').val(response.item.label);
-                    $('#Iduser').val(response.item.id);
-                    $('#admin-radio').show();
-                }
-            });
-        });
 
         $(".btn_delete").click(function() {
             var id = $(this).data('id');
@@ -270,16 +243,5 @@
             });
         });
 
-
-        // $(".btn_delete").click(function() {
-        //     var id = $(this).data('id');
-        //     $.ajax({
-        //         type: "GET",
-        //         url: "{{ url('get-card') }}/" + id,
-        //         success: function(data) {
-        //             $('#Idcard_delete').val(data.Idcard);
-        //         }
-        //     });
-        // });
     </script>
 @stop

@@ -73,15 +73,6 @@ class BarangController extends Controller
         ]);
     }
 
-    public function beverage_image($id)
-    {
-        $data = BarangModel::find($id);
-
-        return response()->json([
-            'status' => 200,
-            'beverage' => $data,
-        ]);
-    }
 
     public function tambah_barang(Request $request)
     {
@@ -136,41 +127,7 @@ class BarangController extends Controller
         ]);
     }
 
-    public function HargaBarang(Request $request, $id)
-    {
 
-        $sortir = 10;
-
-        if ($request->sortir) {
-            $sortir = $request->sortir;
-        }
-
-        $data_HargaBarang = HargaBarangModel::leftjoin('pengguna', 'pengguna.IdPengguna', 'HargaBarang.HargaBarang_ditambah_oleh')
-            ->where('IdBarang', $id)
-            ->orderBy('IdHargaBarang', 'DESC')
-            ->paginate($sortir);
-
-        return view('Admin.Barang.harga-barang', [
-            'title' => 'Harga Barang',
-            'IdAkses' => $request->Session()->get('IdAkses'),
-            'data_HargaBarang' => $data_HargaBarang,
-            'id' => $id,
-        ]);
-    }
-
-
-    public function delete_beverage_price(Request $request)
-    {
-        $data = HargaBarangModel::where('IdBarang_price', $request->IdBarang_price_delete)->forceDelete();
-
-        if ($data) {
-            \Session::put('success', 'Hapu Harga Barang Sukses!');
-            return redirect()->back();
-        } else {
-            \Session::put('error', 'Delete Beverage Price Failed!');
-            return redirect()->back();
-        }
-    }
 
 
     public function item_delete_beverage(Request $request, $id)
@@ -194,24 +151,6 @@ class BarangController extends Controller
         ]);
     }
 
-    public function item_edit_beverage_price($id)
-    {
-        $data = HargaBarangModel::find($id);
-
-        return response()->json([
-            'status' => 200,
-            'beverage_price' => $data,
-        ]);
-    }
-    public function item_delete_beverage_price($id)
-    {
-        $data = HargaBarangModel::find($id);
-
-        return response()->json([
-            'status' => 200,
-            'delete' => $data,
-        ]);
-    }
 
     public function list_transaksi(Request $request)
     {
